@@ -173,6 +173,28 @@ svg.ring { transform:rotate(-90deg); }
 .empty-box { text-align:center; padding:40px 20px; color:var(--muted); font-size:13px; line-height:2; }
 .empty-box .ei { font-size:38px; display:block; margin-bottom:10px; opacity:.3; }
 
+/* ── SKELETON ── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.skel {
+  background: linear-gradient(90deg, var(--card2) 25%, var(--border) 50%, var(--card2) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+.tx-skel {
+  display:flex; align-items:center; gap:12px;
+  padding:13px 14px; background:var(--card);
+  border-radius:16px; margin-bottom:8px;
+}
+.tx-skel-icon { width:42px; height:42px; border-radius:13px; flex-shrink:0; }
+.tx-skel-body { flex:1; display:flex; flex-direction:column; gap:7px; }
+.tx-skel-name { height:13px; width:55%; }
+.tx-skel-meta { height:10px; width:35%; }
+.tx-skel-amt  { width:52px; height:13px; border-radius:6px; flex-shrink:0; }
+
 /* FAB */
 .fab { position:fixed; bottom:max(24px, env(safe-area-inset-bottom,24px)); right:20px; width:56px; height:56px; background:var(--accent); border-radius:50%; border:none; cursor:pointer; font-size:28px; display:flex; align-items:center; justify-content:center; color:#0a0a0f; box-shadow:0 8px 28px rgba(200,240,96,.3); transition:all .2s; z-index:30; font-weight:300; line-height:1; }
 .fab:active { transform:scale(.9); }
@@ -486,12 +508,13 @@ function showApp(user) {
   document.getElementById('menuUserName').textContent = user.displayName || 'User';
   document.getElementById('menuUserEmail').textContent = user.email || '';
 
-  // Show app shell right away with empty state
+  // Show app shell right away with skeleton state
   document.getElementById('authScreen').classList.add('hidden');
   document.getElementById('loadingScreen').classList.add('hidden');
   document.getElementById('appShell').style.display = 'flex';
   document.getElementById('fab').style.display = 'flex';
   window.txs = [];
+  window.dataLoaded = false;
   window.render();
 
   // Subscribe to real-time Firestore updates
@@ -499,12 +522,14 @@ function showApp(user) {
   const q = query(collection(db, 'users', user.uid, 'transactions'), orderBy('date','desc'));
   unsubSnapshot = onSnapshot(q, snap => {
     window.txs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    window.dataLoaded = true;
     window.render();
   }, err => console.error('Snapshot error:', err));
 }
 
 function showAuth() {
   if (unsubSnapshot) { unsubSnapshot(); unsubSnapshot = null; }
+  window.dataLoaded = false;
   document.getElementById('authScreen').classList.remove('hidden');
   document.getElementById('appShell').style.display = 'none';
   document.getElementById('fab').style.display = 'none';
@@ -566,6 +591,7 @@ const CATS = {
     {id:'entertainment',emoji:'🎬',name:'Entertain',color:'#a78bfa'},
     {id:'rent',emoji:'🏠',name:'Rent',color:'#f87171'},
     {id:'education',emoji:'📚',name:'Education',color:'#60a5fa'},
+    {id:'investment',emoji:'📈',name:'Investment',color:'#c8f060'},
     {id:'other',emoji:'📦',name:'Other',color:'#6b6b8a'},
   ],
   income:[
@@ -589,6 +615,20 @@ function fmtS(n){
   return '₹'+Math.round(n);
 }
 function getCat(type,id){ return (CATS[type]||[]).find(c=>c.id===id)||{id,emoji:'📦',name:id,color:'#888'}; }
+
+window.dataLoaded = false;
+
+function skeletonCards(n=4){
+  return Array.from({length:n},()=>`
+    <div class="tx-skel">
+      <div class="tx-skel-icon skel"></div>
+      <div class="tx-skel-body">
+        <div class="tx-skel-name skel"></div>
+        <div class="tx-skel-meta skel"></div>
+      </div>
+      <div class="tx-skel-amt skel"></div>
+    </div>`).join('');
+}
 
 // ── NAVIGATION ───────────────────────────────────────────
 function goToPage(n){
@@ -787,9 +827,11 @@ function renderDashboard(){
   document.getElementById('ringPct').style.color=pct>=1?'var(--red)':'var(--accent)';
   document.getElementById('budgetSub').textContent=fmtS(expense)+' of '+fmtS(BUDGET)+' used';
   const recent=txs.slice(0,5);
-  document.getElementById('recentList').innerHTML=recent.length
-    ? recent.map((t,i)=>txCard(t,i*.05)).join('')
-    : `<div class="empty-box"><span class="ei">💸</span>No transactions yet.<br>Tap + to add one.</div>`;
+  document.getElementById('recentList').innerHTML = !window.dataLoaded
+    ? skeletonCards(4)
+    : recent.length
+      ? recent.map((t,i)=>txCard(t,i*.05)).join('')
+      : `<div class="empty-box"><span class="ei">💸</span>No transactions yet.<br>Tap + to add one.</div>`;
 }
 
 function renderAnalytics(){
@@ -849,7 +891,12 @@ function renderHistory(){
     if(q&&!t.desc.toLowerCase().includes(q)) return false;
     return true;
   });
-  document.getElementById('histSub').textContent=filtered.length+' transactions';
+  document.getElementById('histSub').textContent = !window.dataLoaded ? 'Loading…' : filtered.length+' transactions';
+
+  if(!window.dataLoaded){
+    document.getElementById('histList').innerHTML = skeletonCards(6);
+    return;
+  }
   if(!filtered.length){
     document.getElementById('histList').innerHTML=`<div class="empty-box"><span class="ei">🔍</span>Nothing found.</div>`;
     return;
