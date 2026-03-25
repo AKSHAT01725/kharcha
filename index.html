@@ -127,6 +127,143 @@ html,body { height:100%; width:100%; overflow:hidden; background:var(--bg); colo
 .page { width:calc(100%/3); height:100%; overflow-y:auto; overflow-x:hidden; padding:0 16px 32px; scrollbar-width:none; }
 .page::-webkit-scrollbar { display:none; }
 
+/* Sidebar hidden on mobile */
+.sidebar { display:none; }
+.desktop-main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+@media (min-width: 768px) {
+  html,body { overflow:auto; }
+
+  .app-shell {
+    height:100dvh;
+    flex-direction:row;
+    overflow:hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width:220px; flex-shrink:0;
+    background:var(--card);
+    border-right:1px solid var(--border);
+    display:flex; flex-direction:column;
+    padding:28px 16px 24px;
+    gap:6px;
+    height:100dvh;
+    position:relative; z-index:10;
+  }
+  .sidebar-logo {
+    font-size:20px; font-weight:800; letter-spacing:.14em;
+    padding:0 10px; margin-bottom:28px;
+  }
+  .sidebar-logo span { color:var(--accent); }
+  .sidebar-nav-btn {
+    display:flex; align-items:center; gap:12px;
+    padding:11px 14px; border-radius:13px;
+    background:none; border:none; cursor:pointer;
+    color:var(--muted); font-family:'Outfit',sans-serif;
+    font-size:14px; font-weight:700; letter-spacing:.02em;
+    transition:all .18s; text-align:left; width:100%;
+  }
+  .sidebar-nav-btn:hover { background:var(--card2); color:var(--text); }
+  .sidebar-nav-btn.active { background:rgba(200,240,96,.1); color:var(--accent); }
+  .sidebar-nav-btn .snb-icon { font-size:18px; flex-shrink:0; width:22px; text-align:center; }
+  .sidebar-bottom {
+    margin-top:auto; padding-top:16px;
+    border-top:1px solid var(--border);
+  }
+  .sidebar-user {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 10px; border-radius:12px;
+    cursor:pointer; transition:background .15s;
+  }
+  .sidebar-user:hover { background:var(--card2); }
+  .sidebar-user-info { flex:1; min-width:0; }
+  .sidebar-user-name { font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sidebar-user-email { font-size:10px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family:'JetBrains Mono',monospace; }
+
+  /* Hide mobile-only elements */
+  .top-nav { display:none; }
+  .status-bar { display:none; }
+
+  /* Main content area */
+  .desktop-main {
+    flex:1; display:flex; flex-direction:column; overflow:hidden;
+    background:var(--bg);
+  }
+
+  /* Desktop top bar */
+  .desktop-topbar {
+    display:flex !important; align-items:center; justify-content:space-between;
+    padding:20px 32px 0;
+    flex-shrink:0;
+  }
+  .desktop-topbar-title { font-size:22px; font-weight:800; letter-spacing:-.01em; }
+  .desktop-topbar-sub { font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:2px; }
+  .desktop-add-btn {
+    display:flex !important; align-items:center; gap:8px;
+    background:var(--accent); border:none; border-radius:12px;
+    padding:10px 18px; font-family:'Outfit',sans-serif;
+    font-size:13px; font-weight:800; color:#0a0a0f;
+    cursor:pointer; letter-spacing:.04em;
+    transition:all .2s; flex-shrink:0;
+  }
+  .desktop-add-btn:hover { opacity:.9; transform:translateY(-1px); }
+  .desktop-add-btn:active { transform:scale(.97); }
+
+  /* Pages become a tab container */
+  .pages-wrap { flex:1; overflow:hidden; }
+  .pages-track { transition:transform .38s cubic-bezier(.4,0,.2,1); }
+  .page { padding:20px 32px 40px; }
+
+  /* Content max-width */
+  .page-inner { max-width:820px; }
+
+  /* Dashboard: 2-col layout */
+  .dash-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    align-items:start;
+  }
+  .dash-col-left { display:flex; flex-direction:column; gap:12px; }
+  .dash-col-right { display:flex; flex-direction:column; gap:12px; }
+
+  /* Analytics: wider bars */
+  .bar-chart { height:140px; }
+  .cat-grid { grid-template-columns:repeat(3,1fr); }
+  .insight-grid { grid-template-columns:repeat(4,1fr); }
+
+  /* FAB hidden on desktop */
+  .fab { display:none !important; }
+
+  /* Bottom sheet → centered modal on desktop */
+  .bottom-sheet {
+    top:50%; left:50%;
+    right:auto; bottom:auto;
+    transform:translate(-50%,-48%) scale(.96);
+    width:460px; max-width:calc(100vw - 48px);
+    border-radius:24px;
+    max-height:90dvh;
+    opacity:0;
+    transition:transform .3s cubic-bezier(.4,0,.2,1), opacity .3s ease;
+  }
+  .bottom-sheet.open {
+    transform:translate(-50%,-50%) scale(1);
+    opacity:1;
+  }
+  .sheet-handle { display:none; }
+
+  /* User menu anchored to sidebar */
+  .user-menu {
+    top:auto; bottom:80px; left:228px; right:auto;
+    transform-origin:bottom left;
+    transform:scale(.92) translateY(8px);
+  }
+  .user-menu.open { transform:scale(1) translateY(0); }
+
+  /* Nav dots hidden */
+  .nav-dots { display:none; }
+}
+
 
 
 /* ── PAGE 1: DASHBOARD ── */
@@ -327,6 +464,7 @@ select.field-in option { background:#1a1a26; }
 <div class="app-shell" id="appShell" style="display:none">
   <div class="status-bar"></div>
 
+  <!-- Mobile top nav -->
   <div class="top-nav">
     <div class="wordmark">KHARCHA<span>.</span></div>
     <div class="nav-right">
@@ -341,102 +479,142 @@ select.field-in option { background:#1a1a26; }
     </div>
   </div>
 
-  <div class="pages-wrap" id="pagesWrap">
-    <div class="pages-track" id="pagesTrack">
-
-      <!-- PAGE 1: DASHBOARD -->
-      <div class="page" id="page0">
-        <div class="balance-card anim">
-          <div class="bal-label">Net Balance</div>
-          <div class="bal-amount" id="p1Bal">₹0.00</div>
-          <div class="bal-row">
-            <div class="bal-pill">
-              <div class="pill-lbl" style="color:var(--green)"><div class="pill-dot" style="background:var(--green)"></div>Income</div>
-              <div class="pill-amt" style="color:var(--green)" id="p1Inc">₹0</div>
-            </div>
-            <div class="bal-pill">
-              <div class="pill-lbl" style="color:var(--red)"><div class="pill-dot" style="background:var(--red)"></div>Expenses</div>
-              <div class="pill-amt" style="color:var(--red)" id="p1Exp">₹0</div>
-            </div>
-          </div>
+  <!-- Desktop sidebar (hidden on mobile via CSS) -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">KHARCHA<span>.</span></div>
+    <button class="sidebar-nav-btn active" id="snb0" onclick="goToPage(0)">
+      <span class="snb-icon">🏠</span> Dashboard
+    </button>
+    <button class="sidebar-nav-btn" id="snb1" onclick="goToPage(1)">
+      <span class="snb-icon">📊</span> Analytics
+    </button>
+    <button class="sidebar-nav-btn" id="snb2" onclick="goToPage(2)">
+      <span class="snb-icon">📋</span> History
+    </button>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user" onclick="toggleUserMenu()">
+        <div class="nav-avatar" id="navAvatarDesktop" style="width:34px;height:34px;font-size:13px;">
+          <span id="avatarInitialDesktop">?</span>
         </div>
-
-        <div class="budget-card anim" style="animation-delay:.07s">
-          <div class="ring-wrap">
-            <svg class="ring" width="70" height="70" viewBox="0 0 70 70">
-              <circle class="ring-bg" cx="35" cy="35" r="30"/>
-              <circle class="ring-fill" id="ringFill" cx="35" cy="35" r="30"
-                stroke="var(--accent)" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
-            </svg>
-            <div class="ring-center">
-              <span class="ring-pct" id="ringPct">0%</span>
-              <span class="ring-sub">USED</span>
-            </div>
-          </div>
-          <div class="budget-info">
-            <div class="bi-title">Monthly Budget</div>
-            <div class="bi-sub" id="budgetSub">₹0 of ₹30,000 used</div>
-          </div>
-        </div>
-
-        <div class="sec-hdr anim" style="animation-delay:.12s">
-          <span class="sec-title">Recent</span>
-          <button class="sec-link" onclick="goToPage(2)">All →</button>
-        </div>
-        <div id="recentList"></div>
-      </div>
-
-      <!-- PAGE 2: ANALYTICS -->
-      <div class="page" id="page1">
-        <div class="page-title anim">Analytics</div>
-        <div class="page-sub anim" style="animation-delay:.04s" id="analyticsDate">This Month</div>
-
-        <div class="analytics-card anim" style="animation-delay:.08s">
-          <div class="ac-title">Daily Spending — Last 7 Days</div>
-          <div class="bar-chart" id="barChart"></div>
-        </div>
-
-        <div class="sec-hdr anim" style="animation-delay:.12s"><span class="sec-title">By Category</span></div>
-        <div class="cat-grid" id="catGrid"></div>
-
-        <div class="sec-hdr anim" style="animation-delay:.16s"><span class="sec-title">Insights</span></div>
-        <div class="insight-grid anim" style="animation-delay:.18s">
-          <div class="ins-card"><div class="ins-icon">📅</div><div class="ins-val" id="insAvg">₹0</div><div class="ins-lbl">Avg / Day</div></div>
-          <div class="ins-card"><div class="ins-icon">🔥</div><div class="ins-val" id="insTop">—</div><div class="ins-lbl">Top Category</div></div>
-          <div class="ins-card"><div class="ins-icon">📊</div><div class="ins-val" id="insCnt">0</div><div class="ins-lbl">Transactions</div></div>
-          <div class="ins-card"><div class="ins-icon">💹</div><div class="ins-val" id="insSave">₹0</div><div class="ins-lbl">Saved</div></div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarUserName">—</div>
+          <div class="sidebar-user-email" id="sidebarUserEmail">—</div>
         </div>
       </div>
-
-      <!-- PAGE 3: HISTORY -->
-      <div class="page" id="page2">
-        <div class="page-title anim">History</div>
-        <div class="page-sub anim" style="animation-delay:.04s" id="histSub">All transactions</div>
-
-        <div class="search-bar anim" style="animation-delay:.08s">
-          <span style="font-size:15px;color:var(--muted)">🔍</span>
-          <input type="text" id="searchIn" placeholder="Search…" oninput="renderHistory()">
-        </div>
-
-        <div class="chips anim" style="animation-delay:.1s" id="chipBar">
-          <div class="chip active" onclick="setHF('all',this)">All</div>
-          <div class="chip" onclick="setHF('income',this)">Income</div>
-          <div class="chip" onclick="setHF('expense',this)">Expense</div>
-          <div class="chip" onclick="setHF('food',this)">🍜 Food</div>
-          <div class="chip" onclick="setHF('transport',this)">🚗 Transport</div>
-          <div class="chip" onclick="setHF('shopping',this)">🛍️ Shopping</div>
-          <div class="chip" onclick="setHF('entertainment',this)">🎬 Entertain</div>
-          <div class="chip" onclick="setHF('health',this)">💊 Health</div>
-        </div>
-
-        <div id="histList"></div>
-      </div>
-
     </div>
   </div>
+
+  <!-- Desktop main content wrapper -->
+  <div class="desktop-main" id="desktopMain">
+    <!-- Desktop topbar (hidden on mobile) -->
+    <div class="desktop-topbar" id="desktopTopbar" style="display:none">
+      <div>
+        <div class="desktop-topbar-title" id="desktopTitle">Dashboard</div>
+        <div class="desktop-topbar-sub" id="desktopSub">Overview of your finances</div>
+      </div>
+      <button class="desktop-add-btn" onclick="openSheet()">
+        <span style="font-size:18px;line-height:1">+</span> Add Transaction
+      </button>
+    </div>
+
+    <div class="pages-wrap" id="pagesWrap">
+      <div class="pages-track" id="pagesTrack">
+
+        <!-- PAGE 1: DASHBOARD -->
+        <div class="page" id="page0">
+          <div class="balance-card anim">
+            <div class="bal-label">Net Balance</div>
+            <div class="bal-amount" id="p1Bal">₹0.00</div>
+            <div class="bal-row">
+              <div class="bal-pill">
+                <div class="pill-lbl" style="color:var(--green)"><div class="pill-dot" style="background:var(--green)"></div>Income</div>
+                <div class="pill-amt" style="color:var(--green)" id="p1Inc">₹0</div>
+              </div>
+              <div class="bal-pill">
+                <div class="pill-lbl" style="color:var(--red)"><div class="pill-dot" style="background:var(--red)"></div>Expenses</div>
+                <div class="pill-amt" style="color:var(--red)" id="p1Exp">₹0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="budget-card anim" style="animation-delay:.07s">
+            <div class="ring-wrap">
+              <svg class="ring" width="70" height="70" viewBox="0 0 70 70">
+                <circle class="ring-bg" cx="35" cy="35" r="30"/>
+                <circle class="ring-fill" id="ringFill" cx="35" cy="35" r="30"
+                  stroke="var(--accent)" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+              </svg>
+              <div class="ring-center">
+                <span class="ring-pct" id="ringPct">0%</span>
+                <span class="ring-sub">USED</span>
+              </div>
+            </div>
+            <div class="budget-info">
+              <div class="bi-title">Monthly Budget</div>
+              <div class="bi-sub" id="budgetSub">₹0 of ₹30,000 used</div>
+            </div>
+          </div>
+
+          <div class="sec-hdr anim" style="animation-delay:.12s">
+            <span class="sec-title">Recent</span>
+            <button class="sec-link" onclick="goToPage(2)">All →</button>
+          </div>
+          <div id="recentList"></div>
+        </div>
+
+        <!-- PAGE 2: ANALYTICS -->
+        <div class="page" id="page1">
+          <div class="page-title anim">Analytics</div>
+          <div class="page-sub anim" style="animation-delay:.04s" id="analyticsDate">This Month</div>
+
+          <div class="analytics-card anim" style="animation-delay:.08s">
+            <div class="ac-title">Daily Spending — Last 7 Days</div>
+            <div class="bar-chart" id="barChart"></div>
+          </div>
+
+          <div class="sec-hdr anim" style="animation-delay:.12s"><span class="sec-title">By Category</span></div>
+          <div class="cat-grid" id="catGrid"></div>
+
+          <div class="sec-hdr anim" style="animation-delay:.16s"><span class="sec-title">Insights</span></div>
+          <div class="insight-grid anim" style="animation-delay:.18s">
+            <div class="ins-card"><div class="ins-icon">📅</div><div class="ins-val" id="insAvg">₹0</div><div class="ins-lbl">Avg / Day</div></div>
+            <div class="ins-card"><div class="ins-icon">🔥</div><div class="ins-val" id="insTop">—</div><div class="ins-lbl">Top Category</div></div>
+            <div class="ins-card"><div class="ins-icon">📊</div><div class="ins-val" id="insCnt">0</div><div class="ins-lbl">Transactions</div></div>
+            <div class="ins-card"><div class="ins-icon">💹</div><div class="ins-val" id="insSave">₹0</div><div class="ins-lbl">Saved</div></div>
+          </div>
+        </div>
+
+        <!-- PAGE 3: HISTORY -->
+        <div class="page" id="page2">
+          <div class="page-title anim">History</div>
+          <div class="page-sub anim" style="animation-delay:.04s" id="histSub">All transactions</div>
+
+          <div class="search-bar anim" style="animation-delay:.08s">
+            <span style="font-size:15px;color:var(--muted)">🔍</span>
+            <input type="text" id="searchIn" placeholder="Search…" oninput="renderHistory()">
+          </div>
+
+          <div class="chips anim" style="animation-delay:.1s" id="chipBar">
+            <div class="chip active" onclick="setHF('all',this)">All</div>
+            <div class="chip" onclick="setHF('income',this)">Income</div>
+            <div class="chip" onclick="setHF('expense',this)">Expense</div>
+            <div class="chip" onclick="setHF('food',this)">🍜 Food</div>
+            <div class="chip" onclick="setHF('transport',this)">🚗 Transport</div>
+            <div class="chip" onclick="setHF('shopping',this)">🛍️ Shopping</div>
+            <div class="chip" onclick="setHF('entertainment',this)">🎬 Entertain</div>
+            <div class="chip" onclick="setHF('health',this)">💊 Health</div>
+          </div>
+
+          <div id="histList"></div>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- /desktop-main -->
 </div>
 
 <button class="fab" id="fab" onclick="openSheet()" style="display:none">+</button>
+
 
 
 <div class="sheet-backdrop" id="backdrop" onclick="closeSheet()"></div>
@@ -497,22 +675,32 @@ const provider = new GoogleAuthProvider();
 let unsubSnapshot = null;
 
 function showApp(user) {
-  // Update avatar immediately
+  // Update avatar immediately (mobile + desktop)
   const avatar = document.getElementById('navAvatar');
+  const avatarD = document.getElementById('navAvatarDesktop');
   if (user.photoURL) {
     avatar.innerHTML = `<img src="${user.photoURL}" alt="">`;
+    avatarD.innerHTML = `<img src="${user.photoURL}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
   } else {
-    document.getElementById('avatarInitial').textContent =
-      (user.displayName || user.email || '?')[0].toUpperCase();
+    const ini = (user.displayName || user.email || '?')[0].toUpperCase();
+    document.getElementById('avatarInitial').textContent = ini;
+    document.getElementById('avatarInitialDesktop').textContent = ini;
   }
   document.getElementById('menuUserName').textContent = user.displayName || 'User';
   document.getElementById('menuUserEmail').textContent = user.email || '';
+  document.getElementById('sidebarUserName').textContent = user.displayName || 'User';
+  document.getElementById('sidebarUserEmail').textContent = user.email || '';
 
   // Show app shell right away with skeleton state
   document.getElementById('authScreen').classList.add('hidden');
   document.getElementById('loadingScreen').classList.add('hidden');
   document.getElementById('appShell').style.display = 'flex';
   document.getElementById('fab').style.display = 'flex';
+  // Show desktop topbar on desktop
+  if (window.innerWidth >= 768) {
+    document.getElementById('desktopTopbar').style.display = 'flex';
+    document.getElementById('fab').style.display = 'none';
+  }
   window.txs = [];
   window.dataLoaded = false;
   window.render();
@@ -631,13 +819,32 @@ function skeletonCards(n=4){
 }
 
 // ── NAVIGATION ───────────────────────────────────────────
+const PAGE_TITLES = [
+  {title:'Dashboard', sub:'Overview of your finances'},
+  {title:'Analytics', sub:'Spending breakdown'},
+  {title:'History',   sub:'All your transactions'},
+];
+
 function goToPage(n){
   curPage=n;
   document.getElementById('pagesTrack').style.transform=`translateX(-${n*33.3333}%)`;
   document.querySelectorAll('.nav-dot').forEach((d,i)=>d.classList.toggle('active',i===n));
+  // Sidebar active state
+  [0,1,2].forEach(i=>{
+    const btn=document.getElementById('snb'+i);
+    if(btn) btn.classList.toggle('active',i===n);
+  });
+  // Desktop topbar title
+  const dt=document.getElementById('desktopTitle');
+  const ds=document.getElementById('desktopSub');
+  if(dt){ dt.textContent=PAGE_TITLES[n].title; }
+  if(ds){ ds.textContent=PAGE_TITLES[n].sub; }
+  // FAB only on dashboard (mobile)
   const fab=document.getElementById('fab');
-  fab.style.opacity=n===0?'1':'0';
-  fab.style.pointerEvents=n===0?'all':'none';
+  if(window.innerWidth<768){
+    fab.style.opacity=n===0?'1':'0';
+    fab.style.pointerEvents=n===0?'all':'none';
+  }
   if(n===1) renderAnalytics();
   if(n===2) renderHistory();
 }
@@ -922,6 +1129,23 @@ function render(){
   if(curPage===2) renderHistory();
 }
 window.render=render;
+
+// Handle resize: show/hide topbar and fab correctly
+window.addEventListener('resize', ()=>{
+  const isDesktop = window.innerWidth >= 768;
+  const topbar = document.getElementById('desktopTopbar');
+  const fab = document.getElementById('fab');
+  if(!window._currentUser) return;
+  if(topbar) topbar.style.display = isDesktop ? 'flex' : 'none';
+  if(fab){
+    if(isDesktop){ fab.style.display='none'; }
+    else {
+      fab.style.display='flex';
+      fab.style.opacity=curPage===0?'1':'0';
+      fab.style.pointerEvents=curPage===0?'all':'none';
+    }
+  }
+});
 
 populateCats();
 </script>
